@@ -11,6 +11,14 @@ For example, if you have a line that is below your cursor showing a line number 
 ### Typing one digit
 If the line 235 is a few lines below the cursor, you can type 5 and press keDown to get to get to it. If the line 235 is at the bottom of the screen and your cursor is at the top, you can type 5 and then keDown to be taken to the line in a couple of keDown presses. 
 
+### Reasons for the plugin's existence
+
+Relative line numbers are great, but some people have issues with lines constently moving and the fact they are not absolute. Without relative lines, typing 3052G can be a bit of a chore when you can see the line below you on the screen. 
+
+Moving to the line could include guessing how many lines it is below you, using the mouse, using H L M keys or thrashing j and k. Or even using text search, which can be a bit of a mismatch when you just want to visually select down to the line.
+
+This plugin attempts to give the convenience of Relative lines numbers to those who can't use them. I guess that rather than the lines being relative, VI-KE operates relatively to the lines displayed on the screen. If this is acceptible, a future enhancement could be to highlight the 20 single digits in the line numbers above and below the cursor to indicate you can type a single digit to get to them.
+
 ## Dependencies
 
 VI-KE is written in Lua and requires Neovim. The plugin works with VSCode Neovim.
@@ -20,7 +28,7 @@ VI-KE is written in Lua and requires Neovim. The plugin works with VSCode Neovim
 For example, using Vim-Plug: <br/> 
 Plug 'olambo/vi-ke'
 
-### Keymappings (minimal)
+## Keymappings (minimal)
 ```
 local map = vim.api.nvim_set_keymap
 
@@ -47,16 +55,15 @@ map('x', '0',           "<cmd>lua require('vi-ke').ke0()<CR>",          {noremap
 
 This is very convenient, but the mapping is a break with standard Neovim functionality for j, k behavior with a count. 
 
-### Interoperability with Vim-Sneak
-VI-KE  works really nicely with Sneak without giving up the 's' key. 
-
-Once you have navigated to your line simply pressing ';' will look forwards. Or ',' upwards. You have to install Sneak to use it https://github.com/justinmk/vim-sneak
- 
 ### Enhancing Visual Mode
 
 VI-KE can make visual mode easier to work with, allowing immediate selection of line mode to your desired line. This is a set of mappings that is also a break with standard Neovim functionality.
 
-### Example mapping with Sneak, Visual mode and j and k keys
+### Interoperability with Vim-Sneak
+
+Optional: If you install Sneak https://github.com/justinmk/vim-sneak and map the VI-KE Sneak keys.
+
+## Example mapping with <down> and <up>, j and k keys, Visual mode and Sneak 
 To try out the plugin using the example key mappings
 
  ```
@@ -67,14 +74,14 @@ EOF
 *  Type a 1 or 2 digt number followed by j to go down to the next line ending with that number. Pressing j again will take you down just one line. Same with k, except upwards.
 *  Type a number and then press the down arrow to go to the next matching line (or up arrow)
 *  After typing a single digit and down arrow, if you are not at your destination press the down arrow again without a number
-*  You will have to install Sneak to utilize ';' and ',' once you have reached your line
 *  {partialLineNo}v selects down to that line in visual line mode
 *  vv from normal mode takes you to visual line mode 
 *  In visual mode v is a toggle to and from visual line mode
 * V from normal mode selects to end of line
 *  \<leader\>v selects visual block mode
+*  If you have installed Sneak. Type 9j to got to the next line ending with 9. Then press the ; key. This will hand off to Sneak, which will ask for two characters to search forwards. Typing 0; or 0, will Sneak from the line you are curently on.
 
-### Relativity and relative line numbers
+## Relativity and relative line numbers
 
 VI-KE works relative to absolute line numbers. Do not use this plugin with relative line numbers turned on (especially with the j and k keys mapped ;-)
 
