@@ -15,7 +15,7 @@ If the line 235 is a few lines below the cursor, you can type 5 and press keDown
 
 Relative line numbers are great, but some people have issues with lines constently moving and the fact they are not absolute. Without relative lines, typing 3052G can be a bit of a chore when you can see the line below you on the screen. 
 
-Moving to the line could include guessing how many lines it is below you, using the mouse, using H L M keys or thrashing j and k. Or even using text search, which can be a bit of a mismatch when you just want to visually select down to the line.
+Moving to a line below the cursor could include guessing how many lines there are to the one of interest and typeing {count}j, using the mouse, using H L M keys and/or thrashing j and k. Or even using text search, which can be a bit of a mismatch when you just want to visually select down to the line in visual line mode.
 
 This plugin attempts to give the convenience of Relative lines numbers to those who can't use them. I guess that rather than the lines being relative, VI-KE operates relatively to the lines displayed on the screen. If this is acceptible, a future enhancement could be to highlight the 20 single digits in the line numbers above and below the cursor to indicate you can type a single digit to get to them.
 
