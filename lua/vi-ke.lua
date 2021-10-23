@@ -4,6 +4,8 @@
 
 local keBounce
 local ke0Cnt = 0
+local jkLn = 0
+local hiLn = 0
 
 local function keDir(lnr, cnt, dir, zeroCnt) 
   if cnt >= 100 or cnt < 0 then
@@ -47,6 +49,8 @@ local function keUpOrDown(dir, isBlockMode)
       end
       if ln < 1 then
         ln = 1
+      elseif ln > lastln then
+        ln = lastln
       end
     elseif keBounce then
       if ln < 12 or ln > lastln - 12  then
@@ -65,9 +69,11 @@ local function keUpOrDown(dir, isBlockMode)
   local cv = vim.api.nvim_replace_termcodes('<c-v>',true,false,true)
   if mode == 'v' then 
     vim.api.nvim_feedkeys('V', 'n', false)
-  end
-  if mode == cv or isBlockMode then
     col1Cmd = ''
+  elseif mode == cv or isBlockMode or mode == 'V' then
+    col1Cmd = ''
+  elseif unit == 10 or jkLn ~= 0 then
+    jkLn = ln
   end
   vim.api.nvim_feedkeys(col1Cmd .. ln .. 'G', 'n', false)
 end
@@ -76,21 +82,24 @@ local function ke0()
   local col = vim.fn.col('.')
   ke0Cnt = ke0Cnt + 1
   vim.api.nvim_feedkeys('0', 'n', false)
+  jkLn = 0
 end
 
 local function keDown()
   keUpOrDown(1)
+  jkLn = 0
 end
 
 local function keUp()
   keUpOrDown(-1)
+  jkLn = 0
 end
 
 local function keVisual()
   local cnt = vim.api.nvim_eval('v:count')
   local modeInfo = vim.api.nvim_get_mode()
   local mode = modeInfo.mode
-  if cnt == 0 or mode ~= 'n' then
+  if (cnt == 0 and ke0Cnt == 0) or mode ~= 'n' then
     if mode == 'v' then 
       vim.api.nvim_feedkeys('V', 'n', false)
     else 
@@ -98,7 +107,7 @@ local function keVisual()
     end
   else
     vim.api.nvim_feedkeys('V', 'n', false)
-    keUpOrDown(1)
+    keUpOrDown(1, true)
   end
 end
 
@@ -110,7 +119,7 @@ local function keVisualBlock()
   if mode ~= cv then
     vim.api.nvim_feedkeys(cv,'n',false)
   end
-  if cnt > 0 and mode == 'n' then
+  if (cnt > 0 or ke0Cnt > 0) and mode == 'n' then
     keUpOrDown(1, true)
   elseif mode == 'n' then
     -- select an extra line to start
@@ -150,24 +159,53 @@ local function ke0SneakUp()
   end
 end
 
+local function ke_l()
+  vim.api.nvim_feedkeys('l', 'n', false)
+end
+
 local function ke_j()
   local cnt = vim.api.nvim_eval('v:count')
   local col = vim.fn.col('.')
-  if cnt == 0 and (col > 1 or ke0Cnt == 0) then
-    vim.api.nvim_feedkeys('gj', 'n', false)
-  else
+  if cnt > 0 or (col == 1 and ke0Cnt > 0) or (col == 1 and jkLn == vim.fn.line('.')) then
     keUpOrDown(1)
+  else
+    vim.api.nvim_feedkeys('gj', 'n', false)
+    jkLn = 0
   end
 end
 
 local function ke_k()
   local cnt = vim.api.nvim_eval('v:count')
   local col = vim.fn.col('.')
-  if cnt == 0 and (col > 1 or ke0Cnt == 0) then
-    vim.api.nvim_feedkeys('gk', 'n', false)
-  else
+  if cnt > 0 or (col == 1 and ke0Cnt > 0) or (col == 1 and jkLn == vim.fn.line('.')) then
     keUpOrDown(-1)
+  else
+    vim.api.nvim_feedkeys('gk', 'n', false)
+    jkLn = 0
   end
+end
+
+local function keLightLines(ckLn)
+  local ln = vim.fn.line('.')
+  if ckLn and hiLn == ln then
+    return
+  end
+  vim.api.nvim_command('sign unplace 2 group=*')
+  local a = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+  for i = 1,11 do
+    vim.api.nvim_command('sign place 2 name=ViKeHL line=' .. ln + a[i])
+  end
+  hiLn = ln
+end
+
+local function keLight()
+  vim.api.nvim_command('sign define ViKeHL numhl=ViKeHL')
+  
+  vim.api.nvim_command('augroup ViKeHL_grp')
+  vim.api.nvim_command('au!')
+  vim.api.nvim_command("autocmd CursorMoved * lua require('vi-ke').keLightLines(true)")
+  vim.api.nvim_command("autocmd InsertEnter,InsertLeave,BufEnter * lua require('vi-ke').keLightLines(false)")
+  vim.api.nvim_command('augroup END')
 end
 
 local function status()
@@ -184,5 +222,8 @@ return {
   keVisualBlock = keVisualBlock,
   ke_j = ke_j,
   ke_k = ke_k,
+  ke_l = ke_l,
+  keLightLines = keLightLines,
+  keLight = keLight,
   status = status,
 }

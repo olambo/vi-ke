@@ -14,26 +14,16 @@ map('x', '<up>',       "<cmd>lua require('vi-ke').keUp()<CR>",          {noremap
 map('n', '0',          "<cmd>lua require('vi-ke').ke0()<CR>",           {noremap = true})
 map('x', '0',          "<cmd>lua require('vi-ke').ke0()<CR>",           {noremap = true})
 
--- Optional
--- j and k keys. If a partialLineNo is supplied, go to the line. Otherwise works like original j and k.
+-- j and k keys. If a partialLineNo is supplied, go to the line.
 map('n', 'j',           "<cmd>lua require('vi-ke').ke_j()<CR>",          {noremap = true})
 map('n', 'k',           "<cmd>lua require('vi-ke').ke_k()<CR>",          {noremap = true})
 map('x', 'j',           "<cmd>lua require('vi-ke').ke_j()<CR>",          {noremap = true})
 map('x', 'k',           "<cmd>lua require('vi-ke').ke_k()<CR>",          {noremap = true})
 
--- Optional! 
--- vi-ke for vim-sneak. Sneak needs to be added to your dependencies - https://github.com/justinmk/vim-sneak
--- Using the above keys will prime Sneak, so the next ; or , will activate it.
-map('n', ';',           "<cmd>lua require('vi-ke').ke0Sneak()<CR>",      {noremap = true})
-map('n', ',',           "<cmd>lua require('vi-ke').ke0SneakUp()<CR>",    {noremap = true})
-map('x', ';',           "<cmd>lua require('vi-ke').ke0Sneak()<CR>",      {noremap = true})
-map('x', ',',           "<cmd>lua require('vi-ke').ke0SneakUp()<CR>",    {noremap = true})
--- Give Sneak a mapping so it doesn't sneakily steal the 's' and 'S' keys.
-map('n', '<f99>',       "<Plug>Sneak_s",                                 {noremap = false})
--- Case insensitive Sneak
-vim.g['sneak#use_ic_scs'] = 1
+map('n', 'l',           "<cmd>lua require('vi-ke').ke_l()<CR>",          {noremap = true})
+map('x', 'l',           "<cmd>lua require('vi-ke').ke_l()<CR>",          {noremap = true})
 
--- Optional! 
+
 -- Typing v will go into visual mode. Typing vv from normal mode will activate line mode - mirroring cc, dd
 -- {partialLineNo}v from normal mode will activate visual line mode and move to the line inidicated.
 -- visual mode <-> visual line mode (toggle). 
@@ -45,4 +35,16 @@ map('x', '<leader>v',  "<cmd>lua require('vi-ke').keVisualBlock()<CR>", {noremap
 -- Visual to end of line - mirroring C, D
 map('n', 'V',          "v$h",                                           {noremap = true})
 map('x', 'V',          "$h",                                            {noremap = true})
+
+
+-- vi-ke for vim-sneak. Sneak needs to be added to your dependencies - https://github.com/justinmk/vim-sneak
+-- Using the above keys will prime Sneak, so the next ; or , will activate it.
+map('n', ';',           "<cmd>lua require('vi-ke').ke0Sneak()<CR>",      {noremap = true})
+map('n', ',',           "<cmd>lua require('vi-ke').ke0SneakUp()<CR>",    {noremap = true})
+map('x', ';',           "<cmd>lua require('vi-ke').ke0Sneak()<CR>",      {noremap = true})
+map('x', ',',           "<cmd>lua require('vi-ke').ke0SneakUp()<CR>",    {noremap = true})
+-- Give Sneak a mapping so it doesn't sneakily steal the 's' and 'S' keys.
+map('n', '<f99>',       "<Plug>Sneak_s",                                 {noremap = false})
+-- Case insensitive Sneak
+vim.g['sneak#use_ic_scs'] = 1
 
