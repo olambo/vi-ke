@@ -159,10 +159,6 @@ local function ke0SneakUp()
   end
 end
 
-local function ke_l()
-  vim.api.nvim_feedkeys('l', 'n', false)
-end
-
 local function ke_j()
   local cnt = vim.api.nvim_eval('v:count')
   local col = vim.fn.col('.')
@@ -222,7 +218,6 @@ return {
   keVisualBlock = keVisualBlock,
   ke_j = ke_j,
   ke_k = ke_k,
-  ke_l = ke_l,
   keLightLines = keLightLines,
   keLight = keLight,
   status = status,
