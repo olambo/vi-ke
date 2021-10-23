@@ -35,7 +35,7 @@ local function keDir(lnr, cnt, dir, zeroCnt)
   return l, unit
 end
 
-local function keUpOrDown(dir, isBlockMode)
+local function keUpOrDown(dir, isCol1Mode)
   local cnt = vim.api.nvim_eval('v:count')
   local col = vim.fn.col('.')
   local curln = vim.fn.line('.')
@@ -69,10 +69,10 @@ local function keUpOrDown(dir, isBlockMode)
   local cv = vim.api.nvim_replace_termcodes('<c-v>',true,false,true)
   if mode == 'v' then 
     vim.api.nvim_feedkeys('V', 'n', false)
+  elseif mode == cv or isCol1Mode then
     col1Cmd = ''
-  elseif mode == cv or isBlockMode or mode == 'V' then
-    col1Cmd = ''
-  elseif unit == 10 or jkLn ~= 0 then
+  end
+  if unit == 10 or jkLn ~= 0 then
     jkLn = ln
   end
   vim.api.nvim_feedkeys(col1Cmd .. ln .. 'G', 'n', false)
@@ -163,6 +163,9 @@ local function ke_j()
   local cnt = vim.api.nvim_eval('v:count')
   local col = vim.fn.col('.')
   if cnt > 0 or (col == 1 and ke0Cnt > 0) or (col == 1 and jkLn == vim.fn.line('.')) then
+    if cnt > 0 then 
+      jkLn = 0
+    end
     keUpOrDown(1)
   else
     vim.api.nvim_feedkeys('gj', 'n', false)
@@ -174,6 +177,9 @@ local function ke_k()
   local cnt = vim.api.nvim_eval('v:count')
   local col = vim.fn.col('.')
   if cnt > 0 or (col == 1 and ke0Cnt > 0) or (col == 1 and jkLn == vim.fn.line('.')) then
+    if cnt > 0 then 
+      jkLn = 0
+    end
     keUpOrDown(-1)
   else
     vim.api.nvim_feedkeys('gk', 'n', false)
