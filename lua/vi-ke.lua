@@ -4,8 +4,11 @@
 
 local keBounce
 local ke0Cnt = 0
+local ke0Col = 1
 local jkLn = 0
 local hiLn = 0
+local cv = vim.api.nvim_replace_termcodes('<c-v>',true,false,true)
+local isFfTt = true
 
 local function keDir(lnr, cnt, dir, zeroCnt) 
   if cnt >= 100 or cnt < 0 then
@@ -35,53 +38,80 @@ local function keDir(lnr, cnt, dir, zeroCnt)
   return l, unit
 end
 
-local function keUpOrDown(dir, isCol1Mode)
+local function kePreCol(ke0Cnt, ke0Col)
+  if (ke0Cnt > 0) and (ke0Col > 1) then
+    return ke0Col .. 'l'
+  else 
+    return ''
+  end
+end
+
+local function kePostCol(mode, unit, keepPostcol)
+  if (mode == cv) or (unit == 100) or keepPostcol then
+    return ''
+  else
+    return '0'
+  end
+end
+
+local function keCalcBounce(keBounce, curln, ln, lastln) 
+  if ln < 1 or ln > lastln then 
+    if not keBounce and curln ~= 1 and curln ~= lastln then
+      keBounce = curln
+    end
+    if ln < 1 then
+      ln = 1
+    elseif ln > lastln then
+      ln = lastln
+    end
+  elseif keBounce then
+    if ln < 12 or ln > lastln - 12  then
+      ln = keBounce
+    end
+    keBounce = nil
+  end
+  return keBounce, ln
+end
+
+local function keUpOrDown(dir, keepPostcol)
+  isFfTt = false
   local cnt = vim.api.nvim_eval('v:count')
   local col = vim.fn.col('.')
   local curln = vim.fn.line('.')
   local ln, unit
   if cnt == 0 and (col > 1 or ke0Cnt == 0) then
-    ln = curln + (10 * dir)
     local lastln = vim.fn.line('$')
-    if ln < 1 or ln > lastln then 
-      if not keBounce and curln ~= 1 and curln ~= lastln then
-        keBounce = curln
-      end
-      if ln < 1 then
-        ln = 1
-      elseif ln > lastln then
-        ln = lastln
-      end
-    elseif keBounce then
-      if ln < 12 or ln > lastln - 12  then
-        ln = keBounce
-      end
-      keBounce = nil
-    end
+    ln = curln + (10 * dir)
+    keBounce, ln = keCalcBounce(keBounce, curln, ln, lastln)
   else 
     keBounce = nil
     ln, unit = keDir(curln, cnt, dir, ke0Cnt)
   end
-  ke0Cnt = 0
-  local col1Cmd = '0'
+
   local modeInfo = vim.api.nvim_get_mode()
   local mode = modeInfo.mode
-  local cv = vim.api.nvim_replace_termcodes('<c-v>',true,false,true)
+  local chMode = ''
   if mode == 'v' then 
-    vim.api.nvim_feedkeys('V', 'n', false)
-  elseif mode == cv or isCol1Mode then
-    col1Cmd = ''
+    chMode = 'V'
   end
   if unit == 10 or jkLn ~= 0 then
     jkLn = ln
   end
-  vim.api.nvim_feedkeys(col1Cmd .. ln .. 'G', 'n', false)
+
+  local cmd = kePreCol(ke0Cnt, ke0Col) .. chMode .. ln .. 'G' .. kePostCol(mode, unit, keepPostcol)
+  vim.api.nvim_feedkeys(cmd, 'n', false)
+  ke0Cnt = 0
+  ke0Col = 1
 end
 
-local function ke0()
+local function keZero()
+  isFfTt = false
   local col = vim.fn.col('.')
+  if col > 1 then
+    ke0Col = col
+  end
   ke0Cnt = ke0Cnt + 1
-  vim.api.nvim_feedkeys('0', 'n', false)
+  -- vim.api.nvim_feedkeys('0', 'n', false)
   jkLn = 0
 end
 
@@ -107,7 +137,7 @@ local function keVisual()
     end
   else
     vim.api.nvim_feedkeys('V', 'n', false)
-    keUpOrDown(1, true)
+    keUpOrDown(1)
   end
 end
 
@@ -115,7 +145,6 @@ local function keVisualBlock()
   local cnt = vim.api.nvim_eval('v:count')
   local modeInfo = vim.api.nvim_get_mode()
   local mode = modeInfo.mode
-  local cv = vim.api.nvim_replace_termcodes('<c-v>',true,false,true)
   if mode ~= cv then
     vim.api.nvim_feedkeys(cv,'n',false)
   end
@@ -127,21 +156,40 @@ local function keVisualBlock()
   end
 end
 
+_G.ViKePress = function(k)
+  if k == 'f' or k == 'F' or k == 't' or k == 'T' then isFfTt = true 
+  elseif k == 'l' then jkLn = 0 
+  elseif k == '0' then keZero() 
+  end
+  return k
+end
+
 local function sneakCount()
   local cnt = vim.api.nvim_eval('v:count') 
   local sneakn = ''
-  if cnt > 0 then
-    sneakn = cnt
-  end
+  if cnt > 0 then sneakn = cnt end
   return sneakn
 end
 
+local function newSneakOk(col)
+  if isFfTt then
+    if col == 1 then return true end
+    return false
+  end
+  local sn = vim.fn['sneak#is_sneaking']()
+  return sn ~= 1
+end
+
+-- https://github.com/neovim/neovim/blob/b535575acdb037c35a9b688bc2d8adc2f3dece8d/src/nvim/keymap.h#L225
 local function ke0Sneak()
   local col = vim.fn.col('.')
-  if col == 1 then
-    -- https://github.com/neovim/neovim/blob/b535575acdb037c35a9b688bc2d8adc2f3dece8d/src/nvim/keymap.h#L225
+  if newSneakOk(col) then
     ke0Cnt = 0
+    ke0Col = 1
+    isFfTt = false
     vim.fn.feedkeys(string.format('%c%c%cSneak_s', 0x80, 253, 83))
+  elseif isFfTt then
+    vim.api.nvim_feedkeys(';','n',false)
   else 
     local sneakn = sneakCount()
     vim.fn.feedkeys(sneakn .. string.format('%c%c%cSneak_;', 0x80, 253, 83))
@@ -150,9 +198,13 @@ end
 
 local function ke0SneakUp()
   local col = vim.fn.col('.')
-  if col == 1 then
+  if newSneakOk(col) then
     ke0Cnt = 0
+    ke0Col = 1
+    isFfTt = false
     vim.fn.feedkeys(string.format('%c%c%cSneak_S', 0x80, 253, 83))
+  elseif isFfTt then
+    vim.api.nvim_feedkeys(',','n',false)
   else 
     local sneakn = sneakCount()
     vim.fn.feedkeys(sneakn .. string.format('%c%c%cSneak_,', 0x80, 253, 83))
@@ -160,6 +212,7 @@ local function ke0SneakUp()
 end
 
 local function ke_j()
+  isFfTt = false
   local cnt = vim.api.nvim_eval('v:count')
   local col = vim.fn.col('.')
   if cnt > 0 or (col == 1 and ke0Cnt > 0) or (col == 1 and jkLn == vim.fn.line('.')) then
@@ -174,6 +227,7 @@ local function ke_j()
 end
 
 local function ke_k()
+  isFfTt = false
   local cnt = vim.api.nvim_eval('v:count')
   local col = vim.fn.col('.')
   if cnt > 0 or (col == 1 and ke0Cnt > 0) or (col == 1 and jkLn == vim.fn.line('.')) then
@@ -215,7 +269,6 @@ local function status()
 end
 
 return {
-  ke0 = ke0,
   keDown = keDown,
   keUp = keUp,
   ke0Sneak = ke0Sneak,

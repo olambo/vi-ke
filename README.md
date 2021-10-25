@@ -9,22 +9,26 @@ VI-KE enables motion to a line displayed in your buffer by supplying the last tw
 For example, if you have a line that is below your cursor showing a line number 233, you type 33 and press the j key, to be taken to the line. If the line is above your cursor you press the k key. Typing just the last two digits of a line will take you directly to it, as long as it is displayed on your screen (and your screen doen't somehow display a plethora of lines).
 
 ### Typing one digit
-If the line 235 is a few lines below the cursor, you can type 5 and press the j key to get to get to it. If the line 235 is at the bottom of the screen and your cursor is at the top, you can type 5 and then j several times to be taken to the line.
+This is very convenient and fast. If the line 235 is a few lines below the cursor, you can type 5 and press the j key to get to get to it. If the line 235 is at the bottom of the screen and your cursor is at the top, you can type 5 and then j several times to be taken to the line.
 
 ### Reasons for the plugin's existence
 
-Relative line numbers are great, but some people have issues with lines constently moving and the fact they are not absolute. Without relative lines, typing 3052G can be a bit of a chore when you can see the line below you on the screen. 
+Moving to a line below the cursor (especially in visual mode), means guessing how many lines there are to the one of interest and typing {count}j, using the mouse, using H L M keys and/or thrashing j and k. Navigating directly by typing something like 3052G can be a bit of a chore when you can see the line below you on the screen. 
+As an alternative, using text search, can be a bit of a mismatch when you just want to visually select down to the line in visual line mode. 
 
-Moving to a line below the cursor could include guessing how many lines there are to the one of interest and typeing {count}j, using the mouse, using H L M keys and/or thrashing j and k. Or even using text search, which can be a bit of a mismatch when you just want to visually select down to the line in visual line mode.
+Relative line mode, attempts to fix the above problems, but comes at a cost. Some people have issues with lines constently moving around. The fact they are not absolute is a problem when pair programming.
 
-This plugin attempts to give the convenience of Relative lines numbers to those who can't use them. I guess that rather than the lines being relative, VI-KE operates relatively to the lines displayed on the screen. 
+This plugin mirrors the convenience of relative lines numbers. I guess that rather than the lines being relative, VI-KE operates relatively to the lines displayed on the screen. 
+
+In many instances, this plugin is faster and easier than using relative line numbers, because it alows just one digit to be pressed followed by the same movement key (one or more times).
 
 ## Maping j and k keys
 
-After you do a "one" dight line search via these keys, the j and k keys will move by 10 lines until you leave column 1. If you are on a line with no characters just press a movement key such as return to take you to another line, to resume navigating by 1 line.
-This enables you to get to your target line as fast as possible. It's also quite useful for navigating the file quickly with just the j and k keys.
+After you do a "one" dight line search via these keys, the j and k keys will move by 10 lines until you leave column 1. This enables you to get to your target line as fast as possible. It's also quite useful for navigating the file quickly with just the j and k keys.
 
-A two digit search will not move by 10 lines after the search. This is because you should have already arrived at your destination line.
+If you are on a line with no characters just press l or a movement key to take you to another line, to resume navigating by 1 line.
+
+A two digit search will not move by 10 lines after the search. This is because you should have already arrived at your destination line. 
 
 If you are want to move by the old number of lines count, you have other movement keys that will navigate by {count} lines such as return and ctrl-j, ctrl-p
 
@@ -93,57 +97,8 @@ EOF
 *  In visual mode v is a toggle to and from visual line mode
 * V from normal mode selects to end of line
 *  \<leader\>v selects visual block mode
-*  If you have installed Sneak. Type 9j to got to the next line ending with 9. Then press the ; key. This will hand off to Sneak, which will ask for two characters to search forwards. Typing 0; or 0, will Sneak from the line you are curently on.
+*  If you have installed Sneak. Type 9j to got to the next line ending with 9. Then press the ; key. This will hand off to Sneak, which will ask for two characters to search forwards. To start a new sneak press 'l' or any movement key. If you search using f, F, t, T you will need to move off the line or press '0' to resume sneaking
 
 ### Full key mapping - if you want to make your own mappings
 
-Note - it doesn't really make sense to change the j, k or 0 key mappings.
-
-```
-:lua <<EOF
--- add color to the 10 lines below the cursor to indicate which lines you can navigate to with 1 digit
-vim.api.nvim_command('autocmd ColorScheme * highlight ViKeHL ctermfg=brown guifg=orange')
-require('vi-ke').keLight()
-
-local map = vim.api.nvim_set_keymap
--- j and k keys. If a partialLineNo is supplied, go to the line.
-map('n', 'j',           "<cmd>lua require('vi-ke').ke_j()<CR>",          {noremap = true})
-map('n', 'k',           "<cmd>lua require('vi-ke').ke_k()<CR>",          {noremap = true})
-map('x', 'j',           "<cmd>lua require('vi-ke').ke_j()<CR>",          {noremap = true})
-map('x', 'k',           "<cmd>lua require('vi-ke').ke_k()<CR>",          {noremap = true})
-
--- Need to know when 0 is pressed. It still goes to the start of the line.
-map('n', '0',          "<cmd>lua require('vi-ke').ke0()<CR>",            {noremap = true})
-map('x', '0',          "<cmd>lua require('vi-ke').ke0()<CR>",            {noremap = true})
-
--- Typing v will go into visual mode. Typing vv from normal mode will activate line mode - mirroring cc, dd
--- {partialLineNo}v from normal mode will activate visual line mode and move to the line inidicated.
--- visual mode <-> visual line mode (toggle). 
-map('n', 'v',          "<cmd>lua require('vi-ke').keVisual()<CR>",       {noremap = true})
-map('x', 'v',          "<cmd>lua require('vi-ke').keVisual()<CR>",       {noremap = true})
--- {partialLineNo} visual block mode. I don't use <c-v>, but map it if you do.
-map('n', '<leader>v',  "<cmd>lua require('vi-ke').keVisualBlock()<CR>",  {noremap = true})
-map('x', '<leader>v',  "<cmd>lua require('vi-ke').keVisualBlock()<CR>",  {noremap = true})
--- Visual to end of line - mirroring C, D
-map('n', 'V',          "v$h",                                            {noremap = true})
-map('x', 'V',          "$h",                                             {noremap = true})
-
--- vi-ke for vim-sneak.
-map('n', ';',           "<cmd>lua require('vi-ke').ke0Sneak()<CR>",      {noremap = true})
-map('n', ',',           "<cmd>lua require('vi-ke').ke0SneakUp()<CR>",    {noremap = true})
-map('x', ';',           "<cmd>lua require('vi-ke').ke0Sneak()<CR>",      {noremap = true})
-map('x', ',',           "<cmd>lua require('vi-ke').ke0SneakUp()<CR>",    {noremap = true})
--- Give Sneak a mapping so it doesn't sneakily steal the 's' and 'S' keys.
-map('n', '<f99>',       "<Plug>Sneak_s",                                 {noremap = false})
--- Case insensitive Sneak
-vim.g['sneak#use_ic_scs'] = 1
-
--- If a partialLineNo is supplied, go to the next matching line. Otherwise scroll up or down by 10 lines.
--- Mapping <down> and <up> makes sense on my keyboard setup. Map the keys that make sense on yours.
-map('n', '<down>',     "<cmd>lua require('vi-ke').keDown()<CR>",         {noremap = true})
-map('n', '<up>',       "<cmd>lua require('vi-ke').keUp()<CR>",           {noremap = true})
-map('x', '<down>',     "<cmd>lua require('vi-ke').keDown()<CR>",         {noremap = true})
-map('x', '<up>',       "<cmd>lua require('vi-ke').keUp()<CR>",           {noremap = true})
-EOF
-
-```
+These are available in the lua directory of this plugin.
