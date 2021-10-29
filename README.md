@@ -24,9 +24,9 @@ In many instances, this plugin is faster and easier than using relative line num
 
 ## Maping j and k keys
 
-After you do a "one" dight line search via these keys, the j and k keys will move by 10 lines until you leave column 1. This enables you to get to your target line as fast as possible. It's also quite useful for navigating the file quickly with just the j and k keys.
+After you do a "one" dight line search via these keys, the j and k keys will move by 10 lines until you leave column 1. This enables you to get to your target line as fast as possible. It's also quite useful for navigating the file quickly with just the j and k keys. I show it as turbo mode on my status line.
 
-If you are on a line with no characters just press l or a movement key to take you to another line, to resume navigating by 1 line.
+If you are on a line with no characters just press <esc>, l or a movement key to take you to another line, to resume navigating by 1 line.
 
 A two digit search will not move by 10 lines after the search. This is because you should have already arrived at your destination line. 
 
@@ -34,7 +34,7 @@ If you are want to move by the old number of lines count, you have other movemen
 
 ### Dependencies
 
-VI-KE is written in Lua and requires Neovim. The plugin works with VSCode Neovim.
+VI-KE is written in Lua and requires Neovim.
 
 ### Install
 
@@ -65,7 +65,15 @@ VI-KE works relative to absolute line numbers. Do not use this plugin with relat
 
 ### Enhancing Visual Mode
 
-VI-KE can make visual mode easier to work with, allowing immediate selection of line mode to your desired line. 
+Visual line mode is selected when providing a number which is probably what you want.
+The keystrokes vv and V become consistent with other vim operators. 
+
+* From normal mode vv will go into line mode mirroring cc, dd
+* v inside visual mode toggles between visual and visual line mode
+* V will select visual mode to the end of line
+* From normal mode, {partialLineNo}v will select down to the line in visual line mode
+* {partialLineNo}j inside visual mode will select down to the line in visual line mode
+* `<leader>v` will select visual block mode. `<c-v>` will still also select visual block mode.
 
 ### Interoperability with Vim-Sneak
 

@@ -8,11 +8,12 @@ local ke0Col = 1
 local jkLn = 0
 local hiLn = 0
 local cv = vim.api.nvim_replace_termcodes('<c-v>',true,false,true)
+local esc = vim.api.nvim_replace_termcodes('<esc>',true,false,true)
 local isFfTt = true
 
 local function keDir(lnr, cnt, dir, zeroCnt) 
   if cnt >= 100 or cnt < 0 then
-    print('v:count too big ' .. cnt .. ' set to 0')
+    -- print('v:count too big ' .. cnt .. ' set to 0')
     cnt = 0
   end
 
@@ -158,10 +159,15 @@ end
 
 _G.ViKePress = function(k)
   if k == 'f' or k == 'F' or k == 't' or k == 'T' then isFfTt = true 
-  elseif k == 'l' then jkLn = 0 
+  elseif k == 'l' or k == 'h' or k == esc then jkLn = 0 
   elseif k == '0' then keZero() 
   end
   return k
+end
+
+_G.ViKeTurbo = function(setStatus)
+  if jkLn ~= 0 and setStatus == "off" then jkLn = 0 end
+  return jkLn ~= 0
 end
 
 local function sneakCount()
@@ -264,8 +270,8 @@ local function keLight()
   vim.api.nvim_command('augroup END')
 end
 
-local function status()
-  print("Status is ok")
+local function keStatus()
+  print("VI-KE status is ok")
 end
 
 return {
@@ -279,5 +285,5 @@ return {
   ke_k = ke_k,
   keLightLines = keLightLines,
   keLight = keLight,
-  status = status,
+  keStatus = keStatus,
 }
