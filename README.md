@@ -78,7 +78,7 @@ The keystrokes vv and V become consistent with other vim operators.
 ### Interoperability with Vim-Sneak
 
 If you install Sneak https://github.com/justinmk/vim-sneak and require('vi-ke-sneak') .
-Instead of the default sneak keys, s for forward search, S for for backward search, vi-ke uses ; for forward search and , for backwards search. You have to move 1 character off the search hit to start a new search. s
+Instead of the default sneak keys, s for forward search, S for for backward search, vi-ke uses ; for forward search and , for backwards search. You have to move 1 character off the search hit to start a new search.
 
 ### Keymappings - without j and k keys
 
