@@ -24,7 +24,7 @@ In many instances, this plugin is faster and easier than using relative line num
 
 ## Maping j and k keys
 
-After you do a "one" dight line search via these keys, the j and k keys will move by 10 lines until you leave column 1. This enables you to get to your target line as fast as possible. It's also quite useful for navigating the file quickly with just the j and k keys. I show it as turbo mode on my status line.
+After you do a "one" dight line search via these keys, the j and k keys will move by 10 lines until you leave column 1. This enables you to get to your target line as fast as possible. It's also quite useful for navigating the file quickly with just the j and k keys. I show it as Reader mode on my status line, as it keeps the cursor out of the way, at the left of the content. Perhaps, I'll enhance the mode to prevent text edits until you've left Reader mode.
 
 If you are on a line with no characters just press <esc>, l or a movement key to take you to another line, to resume navigating by 1 line.
 
