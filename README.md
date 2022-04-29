@@ -66,11 +66,10 @@ VI-KE works relative to absolute line numbers. Do not use this plugin with relat
 ### Enhancing Visual Mode
 
 Visual line mode is selected when providing a number which is probably what you want.
-The keystrokes vv and V become consistent with other vim operators. 
+The keystroke vv become consistent with other vim operators. 
 
 * From normal mode vv will go into line mode mirroring cc, dd
 * v inside visual mode toggles between visual and visual line mode
-* V will select visual mode to the end of line
 * From normal mode, {partialLineNo}v will select down to the line in visual line mode
 * {partialLineNo}j inside visual mode will select down to the line in visual line mode
 * `<leader>v` will select visual block mode. `<c-v>` will still also select visual block mode.

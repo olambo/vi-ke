@@ -12,7 +12,3 @@ map('x', 'v',          "<cmd>lua require('vi-ke').keVisual()<CR>",      {noremap
 -- {partialLineNo} visual block mode. I don't use <c-v>, but map it if you do.
 map('n', '<leader>v',  "<cmd>lua require('vi-ke').keVisualBlock()<CR>", {noremap = true})
 map('x', '<leader>v',  "<cmd>lua require('vi-ke').keVisualBlock()<CR>", {noremap = true})
-
--- Visual to end of line - mirroring C, D
-map('n', 'V',          "v$h",                                           {noremap = true})
-map('x', 'V',          "$h",                                            {noremap = true})
