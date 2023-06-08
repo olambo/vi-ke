@@ -1,7 +1,7 @@
  # VI-KE
 
 ## Summary
-VI-KE for Neovim
+VI-KE for Neovim.
 
 VI-KE enables motion to a line displayed in your buffer by supplying the last two digits, or the last digit. It doesn't matter how big the line number is.
 
